@@ -33,11 +33,11 @@ int risingEdge[2] = {1,0};
 
 // Structure to receive data
 typedef struct struct_message {
-  int button_state0;
-  int button_state1;
-  int button_state2;
-  int button_state3;
-  int button_state4;
+  int transmitted_state0;
+  int transmitted_state1;
+  int transmitted_state2;
+  int transmitted_state3;
+  int transmitted_state4;
 } struct_message;
 
 // Create a struct_message to hold the received data
@@ -50,7 +50,6 @@ volatile bool dataReceived = false;
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   // Copy the received data into the myData structure
   memcpy(&myData, incomingData, sizeof(struct_message));
-
   // Set flag to true to indicate data was received (this will be handled in loop)
   dataReceived = true;
 }
@@ -82,7 +81,8 @@ void shiftArrays(int* arrays[], int numArrays, int arraySize, int inputs[]) {
 void setup() {
   // Initialize Serial Monitor
   Serial.begin(115200);
-  Serial.println("Starting Receiver");
+  Serial.println("Starting Receiver 222");
+  // WiFi.begin("dummySSID", "dummyPassword", 1);
 
   // Set LED pin as output
   pinMode(LED0_PIN, OUTPUT);
@@ -110,27 +110,34 @@ void loop() {
     // Reset the flag
     dataReceived = false;
  
-    int inputArray[5] = {
-      myData.button_state0,
-      myData.button_state1,
-      myData.button_state2,
-      myData.button_state3,
-      myData.button_state4,
-    };
+    // int inputArray[5] = {
+    //   myData.button_state0,
+    //   myData.button_state1,
+    //   myData.button_state2,
+    //   myData.button_state3,
+    //   myData.button_state4,
+    // };
 
-    shiftArrays(LEDsBuffer,5,2,inputArray);
+    Serial.print("Data received button state:");
+    Serial.print(myData.transmitted_state0);
+    Serial.print(myData.transmitted_state1);
+    Serial.print(myData.transmitted_state2);
+    Serial.print(myData.transmitted_state3);
+    Serial.println(myData.transmitted_state4);
+
+    // shiftArrays(LEDsBuffer,5,2,inputArray);
 
     // Set the LED state based on the received button state
-    for (int i = 0; i<5; i++){
-      if(compareArrays(LEDsBuffer[i],risingEdge,2)) {
-        *LEDs_State[i] = ! *LEDs_State[i]; 
-      }
-    };
+    // for (int i = 0; i<5; i++){
+    //   if(compareArrays(LEDsBuffer[i],risingEdge,2)) {
+    //     *LEDs_State[i] = ! *LEDs_State[i]; 
+    //   }
+    // };
 
-    digitalWrite(LED0_PIN,LED0_state);
-    digitalWrite(LED1_PIN,LED1_state);
-    digitalWrite(LED2_PIN,LED2_state);
-    digitalWrite(LED3_PIN,LED3_state);
-    digitalWrite(LED4_PIN,LED4_state);
+    digitalWrite(LED0_PIN,myData.transmitted_state0);
+    digitalWrite(LED1_PIN,myData.transmitted_state1);
+    digitalWrite(LED2_PIN,myData.transmitted_state2);
+    digitalWrite(LED3_PIN,myData.transmitted_state3);
+    digitalWrite(LED4_PIN,myData.transmitted_state4);
   }
 }
